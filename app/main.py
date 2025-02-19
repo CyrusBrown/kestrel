@@ -6,14 +6,14 @@ from dotenv import load_dotenv
 
 from typing_extensions import Annotated
 
-# Non-module imports from the same directory must be prefixed with a dot
-from .database import Database
+from .utils.database import Database
 
 # Importing a router from its folder
 from .database_functions import database_router
+from .tba_functions import tba_router
 
 # Importing the authentication function
-from .auth import check_key 
+from .utils.auth import check_key
 
 # Load the enviroment variables from .env
 load_dotenv()
@@ -45,9 +45,14 @@ app.include_router(database_router.router,
                    dependencies=[Depends(check_key)] # Every function in this router requires the api key 
                    )
 
+app.include_router(tba_router.router,
+                   tags=["TBA"],
+                   prefix="/tba",
+                   dependencies=[Depends(check_key)]
+                   )
+
 
 # The following is practically useless code for CORS, check the wiki for more information
-
 origins = [
     "http://localhost",
     "http://localhost:3000",
