@@ -69,9 +69,9 @@ async def get_predicted_aim(event_key: str):
         if aim["match_number"] not in predicted_aim:
             predicted_aim[aim["match_number"]] = {"red": {}, "blue": {}}
         if aim["alliance_color_is_red"]:
-            predicted_aim[aim["match_number"]]["red"][aim["team_number"]] = aim
+            predicted_aim[aim["match_number"]]["red"] = aim
         else:
-            predicted_aim[aim["match_number"]]["blue"][aim["team_number"]] = aim
+            predicted_aim[aim["match_number"]]["blue"] = aim
 
     return predicted_aim
 
