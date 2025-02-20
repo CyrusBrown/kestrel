@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 
 from ..utils.database import Database
+from pydantic import BaseModel
 
 # Define the router object, all endpoints created from this
 router = APIRouter()
@@ -127,3 +128,12 @@ async def get_notes(event_key: str):
     db = Database.get_database(event_key)
     data = await db["notes"].find({}, {"_id": 0}).to_list(length=None)
     return {note["team_number"]: note for note in data}
+
+class Note(BaseModel):
+    note: str
+
+@router.put("/notes/{event_key}/{team_num}")
+async def add_new_note(event_key: str, team_num: str, note: Note):
+    db = Database.get_database(event_key)
+    result = await db["notes"].update_one({"team_number": team_num}, {"$set": {"note": note.note}}, upsert=True)
+    return {"success": result.acknowledged}
