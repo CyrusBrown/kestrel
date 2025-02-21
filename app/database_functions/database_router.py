@@ -139,6 +139,12 @@ async def get_notes(event_key: str):
     data = await db["notes"].find({}, {"_id": 0}).to_list(length=None)
     return {note["team_number"]: note for note in data} # Key each note by team number
 
+@router.get("/notes/{event_key}/{team_num}")
+async def get_notes(event_key: str, team_num: str):
+    db = Database.get_database(event_key)
+    data = await db["notes"].find({"team_number": team_num}, {"_id": 0}).to_list(length=None)
+    return {"notes": data["note"], "team_number": team_num} # Return the note and the team number
+
 class Note(BaseModel):
     note: str
 
