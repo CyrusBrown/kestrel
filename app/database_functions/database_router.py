@@ -154,3 +154,16 @@ async def add_new_note(event_key: str, team_num: str, note: Note):
     result = await db["notes"].update_one({"team_number": team_num},  # Update the note for the team number
                                           {"$set": {"note": note.note}}, upsert=True)  # If the note doesn't exist, create it
     return {"success": result.acknowledged} # Return whether the operation was successful
+
+@router.get("/scout_precision/{event_key}")
+async def get_scout_precision(event_key: str):
+    db = Database.get_database(event_key)
+    data = await db["scout_precision"].find({}, {"_id": 0}).to_list(length=None)
+
+    
+    scout_precision = {}
+    for document in data:
+        if "scout_precision" in document:
+            scout_precision[document["scout_name"]] = {"precision": document["scout_precision"], "rank": document["scout_precision_rank"]}
+
+    return scout_precision
