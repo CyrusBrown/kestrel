@@ -176,5 +176,14 @@ async def get_scout_precision(event_key: str):
                 "rank": document["scout_precision_rank"],
                 "name": document["scout_name"]
             })
-            
+
     return sorted(scout_precision_list, key=lambda d: d["rank"])
+
+
+@router.post("/pit_collection/{event_key}")
+async def add_new_pit_document(event_key: str, pit_data: dict):
+    db = Database.get_database(event_key)
+
+    result = await db["raw_obj_pit"].insert_one(pit_data)
+
+    return {"success": result.acknowledged}
