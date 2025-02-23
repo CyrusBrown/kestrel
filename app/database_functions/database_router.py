@@ -1,4 +1,6 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, UploadFile
+from bson import Binary
+from fastapi.responses import Response
 
 from ..utils.database import Database
 from pydantic import BaseModel
@@ -191,3 +193,41 @@ async def add_new_pit_document(event_key: str, pit_data: dict):
             successful_inserts += 1
 
     return {"sucessfull_inserts": successful_inserts, "failed_inserts": len(pit_data) - successful_inserts}
+
+@router.put("/pit_collection/images/{event_key}")
+async def upload_pit_picture(event_key: str, picture: UploadFile):
+    db = Database.get_database(event_key)
+
+    collection = db["pit_images"]
+
+    # Read the image file in binary mode
+    image_data = await picture.read()
+
+    # Wrap the image data using BSON Binary for safe storage in MongoDB
+    binary_data = Binary(image_data)
+
+    # Create a document that includes the filename and the image binary data
+    document = {
+        "filename": picture.filename,
+        "image": binary_data
+    }
+
+    # Insert the document into the collection
+    result = await collection.update_one({"filename": picture.filename}, {"$set": document}, upsert=True)
+    return {"success": result.acknowledged, "filename": picture.filename}
+
+
+@router.get("/pit_collection/images/{event_key}/{image_name}")
+async def get_pit_picture(event_key: str, image_name: str):
+    db = Database.get_database(event_key)
+
+    collection = db["pit_images"]
+
+    # Retrieve the document by _id
+    document = await collection.find_one({"filename": image_name}, {"_id": 0})
+
+    # Get the binary image data from the document
+    binary_data = document["image"]
+
+    # Return the image data as a FileResponse
+    return Response(content=binary_data, media_type="image/jpeg")
