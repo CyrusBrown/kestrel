@@ -181,9 +181,13 @@ async def get_scout_precision(event_key: str):
 
 
 @router.post("/pit_collection/{event_key}")
-async def add_new_pit_document(event_key: str, pit_data: dict):
+async def add_new_pit_document(event_key: str, pit_data: list):
     db = Database.get_database(event_key)
+    
+    successful_inserts = 0 
+    for doc in pit_data
+        result = await db["raw_obj_pit"].insert_one(pit_data)
+        if result.acknowledged == "ok":
+            successful_inserts += 1
 
-    result = await db["raw_obj_pit"].insert_one(pit_data)
-
-    return {"success": result.acknowledged}
+    return {"sucessfull_inserts": successful_inserts, "failed_inserts": len(pit_data) - successful_inserts}
