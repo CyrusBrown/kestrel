@@ -163,7 +163,7 @@ class Note(BaseModel):
 async def add_new_note(event_key: str, team_num: str, note: Note):
     db = Database.get_database(event_key)
     result = await db["notes"].update_one({"team_number": team_num},  # Update the note for the team number
-                                          {"$set": {"note": note.note}}, upsert=True)  # If the note doesn't exist, create it
+                                          {"$set": {"notes": note.note}}, upsert=True)  # If the note doesn't exist, create it
     return {"success": result.acknowledged} # Return whether the operation was successful
 
 @router.get("/scout_precision/{event_key}")
