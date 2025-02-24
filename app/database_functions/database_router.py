@@ -129,7 +129,7 @@ async def get_ss_team(event_key: str, user: str):
     data = await db["ss_team"].find({"username": user}, {"_id": 0}).to_list(length=None)
     ss_team = {}
     for team in data:
-        ss_team[team["team_num"]] # Key each by team number
+        ss_team[team["team_number"]] = team # Key each by team number
     return ss_team
 
 
