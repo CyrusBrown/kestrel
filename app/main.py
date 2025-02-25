@@ -58,7 +58,7 @@ origins = [
     "http://localhost:3000",
     "http://localhost:5173",
     "https://frc1678.github.io",
-    "https://docs.google.com/spreadsheets/d/1R7hq8ZIbZ3EnrDTrw-KIrIgVyQy9qsfsacBytA62YMo",
+    "https://play.google.com",
 ]
 
 app.add_middleware(
