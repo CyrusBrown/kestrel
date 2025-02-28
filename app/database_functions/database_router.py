@@ -43,6 +43,13 @@ async def get_collection(db_name: str, collection_name: str):
 
     return data
 
+@router.put("/raw/{db_name}/{collection_name}")
+async def add_new_document(db_name: str, collection_name: str, document: dict):
+    
+    db = Database.get_database(db_name)
+    result = await db[collection_name].update_one({"team_number": document["team_number"]}, {"$set": document}, upsert=True)
+
+    return {"success": result.acknowledged}
 
 @router.get("/team/{event_key}/{category}")
 async def get_obj_team(event_key: str, category: str):
