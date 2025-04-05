@@ -10,8 +10,8 @@ from pydantic import BaseModel
 router = APIRouter()
 unauthed_router = APIRouter()
 
-VALID_TEAM_CATAGORIES = ["obj_team", "tba_team", "predicted_team", "pickability", "raw_obj_pit", "subj_team", "picklist"] # Define the valid team categories
-VALID_TIM_CATAGORIES = ["obj_tim", "tba_tim", "subj_tim"] # Define the valid tim categories
+VALID_TEAM_CATAGORIES = ["obj_team", "tba_team", "predicted_team", "pickability", "raw_obj_pit", "subj_team", "picklist", "ss_team"] # Define the valid team categories
+VALID_TIM_CATAGORIES = ["obj_tim", "tba_tim", "subj_tim", "ss_tim"] # Define the valid tim categories
  
 # Endpoint to test whether a given database exists and is working in the cluster
 @router.get("/exists/{db_name}")
