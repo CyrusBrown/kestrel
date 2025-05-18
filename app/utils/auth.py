@@ -7,7 +7,7 @@ api_key_header = APIKeyHeader(name="Kestrel-API-Key", auto_error=False)
 
 # The function to actually authenticate
 def check_key(api_key_header: str = Security(api_key_header)):
-    api_key = os.getenv("API_KEY") # Load the correct key from the enviroment variable
+    api_key = os.getenv("API_KEY") # Load the correct key from the environment variable
     if api_key_header == api_key:
         return "Authorized"
     else:

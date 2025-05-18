@@ -1,4 +1,3 @@
-from email.mime import image
 from fastapi import APIRouter, HTTPException, UploadFile
 from bson import Binary
 from fastapi.responses import Response
@@ -10,8 +9,8 @@ from pydantic import BaseModel
 router = APIRouter()
 unauthed_router = APIRouter()
 
-VALID_TEAM_CATAGORIES = ["obj_team", "tba_team", "predicted_team", "pickability", "predicted_alliances", "raw_obj_pit", "subj_team", "picklist", "ss_team"] # Define the valid team categories
-VALID_TIM_CATAGORIES = ["obj_tim", "tba_tim", "subj_tim", "ss_tim"] # Define the valid tim categories
+VALID_TEAM_CATEGORIES = ["obj_team", "tba_team", "predicted_team", "pickability", "predicted_alliances", "raw_obj_pit", "subj_team", "picklist", "ss_team"] # Define the valid team categories
+VALID_TIM_CATEGORIES = ["obj_tim", "tba_tim", "subj_tim", "ss_tim"] # Define the valid tim categories
  
 # Endpoint to test whether a given database exists and is working in the cluster
 @router.get("/exists/{db_name}")
@@ -54,7 +53,7 @@ async def add_new_document(db_name: str, collection_name: str, document: dict):
 @router.get("/team/{event_key}/{category}")
 async def get_obj_team(event_key: str, category: str):
 
-    if category not in VALID_TEAM_CATAGORIES: # Make sure the category is valid
+    if category not in VALID_TEAM_CATEGORIES: # Make sure the category is valid
         raise HTTPException(status_code=404, detail=f"Invalid team category: {category}")
     
     db = Database.get_database(event_key) # Get the database
@@ -73,7 +72,7 @@ async def get_obj_team(event_key: str, category: str):
 @router.get("/tim/{event_key}/{category}")
 async def get_obj_tim(event_key: str, category: str):
 
-    if category not in VALID_TIM_CATAGORIES: # Make sure the category is valid
+    if category not in VALID_TIM_CATEGORIES: # Make sure the category is valid
         raise HTTPException(status_code=404, detail=f"Invalid tim category: {category}")
     
     db = Database.get_database(event_key)
@@ -183,10 +182,16 @@ async def add_new_note(event_key: str, team_num: str, note: Note):
 @router.get("/scout_precision/{event_key}")
 async def get_scout_precision(event_key: str):
     db = Database.get_database(event_key)
+
+    # Get every document in the scout precision collection, removing the _id field
     data = await db["scout_precision"].find({}, {"_id": 0}).to_list(length=None)
     
     scout_precision_list = []
+
+    # Loop through every scout precision document
     for document in data:
+
+        # If the document has scout precision data, add the data to the list
         if "scout_precision" in document:
             scout_precision_list.append({
                 "precision": document["scout_precision"],
@@ -194,6 +199,7 @@ async def get_scout_precision(event_key: str):
                 "name": document["scout_name"]
             })
 
+    # Sort the scout precision by rank in ascending order
     return sorted(scout_precision_list, key=lambda d: d["rank"])
 
 
@@ -202,12 +208,16 @@ async def add_new_pit_document(event_key: str, pit_data: dict):
     db = Database.get_database(event_key)
     
     successful_inserts = 0 
+    
+    # Loop through every new pit data document
     for doc in pit_data["pit_data"]:
+
+        # If the document with the same team number is already in the database, update it with the new data. Otherwise create a new document
         result = await db["raw_obj_pit"].update_one({"team_number": doc["team_number"]}, {"$set": doc}, upsert=True)
         if result.acknowledged == "ok":
             successful_inserts += 1
 
-    return {"sucessfull_inserts": successful_inserts, "failed_inserts": len(pit_data) - successful_inserts}
+    return {"successful_inserts": successful_inserts, "failed_inserts": len(pit_data) - successful_inserts}
 
 @router.put("/pit_collection/images/{event_key}")
 async def upload_pit_picture(event_key: str, picture: UploadFile):
@@ -229,6 +239,7 @@ async def upload_pit_picture(event_key: str, picture: UploadFile):
 
     # Insert the document into the collection
     result = await collection.update_one({"filename": picture.filename}, {"$set": document}, upsert=True)
+
     return {"success": result.acknowledged, "filename": picture.filename}
 
 
@@ -254,6 +265,7 @@ async def get_pit_picture(event_key: str, image_name: str):
 async def delete_pit_picture(event_key: str, image_name: str):
     db = Database.get_database(event_key)
 
+    # Get the image collection
     collection = db["pit_images"]
 
     # Delete the document by filename
@@ -265,8 +277,10 @@ async def delete_pit_picture(event_key: str, image_name: str):
 async def get_pit_image_list(event_key: str):
     db = Database.get_database(event_key)
 
+    # Get every document in the pit images collection, without the _id or image, leaving just the name
     image_list = await db["pit_images"].find({}, {"_id": 0, "image": 0}).to_list(length=None)
 
+    # Turn the list of dictionaries into just a list of strings
     image_names = [image["filename"] for image in image_list]
 
     return image_names

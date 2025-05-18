@@ -15,7 +15,7 @@ from .tba_functions import tba_router
 # Importing the authentication function
 from .utils.auth import check_key
 
-# Load the enviroment variables from .env
+# Load the environment variables from .env
 load_dotenv()
 
 # This defines a lifespan event, which runs code before and after the api starts
@@ -57,7 +57,7 @@ app.include_router(tba_router.router,
                    )
 
 
-# The following is practically useless code for CORS, check the wiki for more information
+# The following is practically useless code for CORS
 origins = [
     "http://localhost",
     "http://localhost:3000",

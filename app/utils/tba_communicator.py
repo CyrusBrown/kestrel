@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Function to retrive the tba key from its enviorment variable
+# Function to retrieve the tba key from its environment variable
 def get_api_key():
     return os.getenv("TBA_KEY")
 
@@ -20,6 +20,6 @@ async def tba_request(api_url):
         print(f"ERROR: No internet")
         return None
 
-    if request.status_code == 200: # Status code 200 is sucessfull 
+    if request.status_code == 200: # Status code 200 is successful 
         return request.json() # Return the json data
     
