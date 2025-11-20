@@ -61,7 +61,7 @@ app.include_router(tba_router.router,
 origins = [
     "http://localhost",
     "http://localhost:3000",
-    "http://localbost:8080",
+    "http://localhost:8080",
     "http://localhost:5173",
     "https://frc1678.github.io",
     "https://script.googleusercontent.com",
