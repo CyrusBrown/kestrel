@@ -9,7 +9,7 @@ from pydantic import BaseModel
 router = APIRouter()
 unauthed_router = APIRouter()
 
-VALID_TEAM_CATEGORIES = ["obj_team", "tba_team", "predicted_team", "pickability", "predicted_alliances", "raw_obj_pit", "subj_team", "picklist", "ss_team"] # Define the valid team categories
+VALID_TEAM_CATEGORIES = ["obj_team", "tba_team", "predicted_team", "pickability", "predicted_alliances", "obj_pit", "subj_team", "picklist", "ss_team"] # Define the valid team categories
 VALID_TIM_CATEGORIES = ["obj_tim", "tba_tim", "subj_tim", "ss_tim"] # Define the valid tim categories
  
 # Endpoint to test whether a given database exists and is working in the cluster
@@ -213,7 +213,7 @@ async def add_new_pit_document(event_key: str, pit_data: dict):
     for doc in pit_data["pit_data"]:
 
         # If the document with the same team number is already in the database, update it with the new data. Otherwise create a new document
-        result = await db["raw_obj_pit"].update_one({"team_number": doc["team_number"]}, {"$set": doc}, upsert=True)
+        result = await db["obj_pit"].update_one({"team_number": doc["team_number"]}, {"$set": doc}, upsert=True)
         if result.acknowledged == "ok":
             successful_inserts += 1
 
