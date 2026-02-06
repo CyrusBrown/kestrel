@@ -284,7 +284,7 @@ async def get_mpv_user_data(username: str):
     return document["data"]
     
 @router.put("/user/{username}")
-async def get_mpv_user_data(username: str, update_user_data: dict):
+async def update_mpv_user_data(username: str, update_user_data: dict):
     db = Database.get_database("kestrel")
 
     # Updates data for the specified username without upsert
