@@ -284,8 +284,8 @@ async def get_mpv_user_data(username: str):
 
     return document["data"]
     
-@router.put("/user/{username}")
-async def get_mpv_user_data(username: str, update_user_data: dict):
+@router.put("/user/data/{username}")
+async def update_mpv_user_data(username: str, update_user_data: dict):
     db = Database.get_database("kestrel")
 
     # Updates data for the specified username without upsert
@@ -307,7 +307,8 @@ async def create_mpv_user(username: str, password: str):
         raise HTTPException(status_code=409, detail=f"User {username} already exists")
     result1 = await db["mpv_users"].insert_one({"username": username, "password": password})
     result2 = await db["mpv_user_data"].insert_one({"username": username, "data": {}})
-    if result1.
+    if result1.inserted_id is not None and result2.inserted_id is not None:
+        return {"success": f"created user {username}"}
 
 @unauthed_router.get("/pit_collection/image_list/{event_key}")
 async def get_pit_image_list(event_key: str):
