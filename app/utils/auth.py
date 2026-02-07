@@ -23,4 +23,4 @@ def check_key(request: Request, api_key_header: str = Security(api_key_header)):
 
 def generate_access_token(username: str):
     # API KEY + username + current day (UTC)
-    return hashlib.sha256(f"{API_KEY}{username}{datetime.now(timezone.utc).date()}".encode("utf-8"))
+    return hashlib.sha256(f"{API_KEY}{username}{datetime.now(timezone.utc).date()}".encode("utf-8")).hexdigest()
