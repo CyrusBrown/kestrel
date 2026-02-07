@@ -277,7 +277,7 @@ async def delete_pit_picture(event_key: str, image_name: str):
 @router.get("/user/data/{username}")
 async def get_mpv_user_data(username: str):
     db = Database.get_database("kestrel")
-    document = await db["mpv_user_data"].find_one({"username": username}, {"_id", 0}).to_list(length=None)
+    document = await db["mpv_user_data"].find_one({"username": username}, {"_id", 0})
 
     if document is None:
         HTTPException(status_code=404, detail=f"User {username} not found")
@@ -326,7 +326,7 @@ async def get_pit_image_list(event_key: str):
 async def login(username: str, password: str):
     db = Database.get_database("kestrel")
 
-    result = await db["mpv_users"].find_one({"username": username}, {"_id", 0}).to_list(length=None)
+    result = await db["mpv_users"].find_one({"username": username}, {"_id", 0})
     if result is None:
         HTTPException(status_code=404, detail=f"User {username} not found")
     if result["password"] != password:
