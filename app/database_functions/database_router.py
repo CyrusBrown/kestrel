@@ -326,7 +326,7 @@ async def get_pit_image_list(event_key: str):
 async def login(username: str, password: str):
     db = Database.get_database("kestrel")
 
-    result = await db["mpv_users"].find_one({"username": username}, {"_id", 0})
+    result = await db["mpv_users"].find_one({"username": username}, {"_id": 0})
     if result is None:
         HTTPException(status_code=404, detail=f"User {username} not found")
     if result["password"] != password:
