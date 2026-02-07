@@ -4,6 +4,7 @@ from fastapi.responses import Response
 
 from ..utils.database import Database
 from pydantic import BaseModel
+from ..utils.auth import generate_access_token
 
 # Define the router object, all endpoints created from this
 router = APIRouter()
@@ -273,7 +274,7 @@ async def delete_pit_picture(event_key: str, image_name: str):
 
     return {"success": result.acknowledged}
 
-@router.get("/user/{username}")
+@router.get("/user/data/{username}")
 async def get_mpv_user_data(username: str):
     db = Database.get_database("kestrel")
     document = await db["mpv_user_data"].find_one({"username": username}, {"_id", 0}).to_list(length=None)
@@ -283,7 +284,7 @@ async def get_mpv_user_data(username: str):
 
     return document["data"]
     
-@router.put("/user/{username}")
+@router.put("/user/data/{username}")
 async def update_mpv_user_data(username: str, update_user_data: dict):
     db = Database.get_database("kestrel")
 
@@ -296,6 +297,19 @@ async def update_mpv_user_data(username: str, update_user_data: dict):
 
     return {"success": result.acknowledged}
 
+@router.post("/user/create/{username}/{password}")
+async def create_mpv_user(username: str, password: str):
+    db = Database.get_database("kestrel")
+
+    # make sure user does not already exist
+    exists = await db["mpv_users"].find_one({"username": username}, {"_id": 0})
+    if exists is not None:
+        raise HTTPException(status_code=409, detail=f"User {username} already exists")
+    result1 = await db["mpv_users"].insert_one({"username": username, "password": password})
+    result2 = await db["mpv_user_data"].insert_one({"username": username, "data": {}})
+    if result1.inserted_id is not None and result2.inserted_id is not None:
+        return {"success": f"created user {username}"}
+
 @unauthed_router.get("/pit_collection/image_list/{event_key}")
 async def get_pit_image_list(event_key: str):
     db = Database.get_database(event_key)
@@ -307,3 +321,15 @@ async def get_pit_image_list(event_key: str):
     image_names = [image["filename"] for image in image_list]
 
     return image_names
+
+@unauthed_router.post("/user/login/{username}/{password}")
+async def login(username: str, password: str):
+    db = Database.get_database("kestrel")
+
+    result = await db["mpv_users"].find_one({"username": username}, {"_id", 0}).to_list(length=None)
+    if result is None:
+        HTTPException(status_code=404, detail=f"User {username} not found")
+    if result["password"] != password:
+        HTTPException(status_code=404, detail=f"Invalid password {password}")
+    
+    return generate_access_token(username)
