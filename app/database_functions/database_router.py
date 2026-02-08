@@ -5,6 +5,7 @@ from fastapi.responses import Response
 from ..utils.database import Database
 from pydantic import BaseModel
 from ..utils.auth import generate_access_token
+from datetime import datetime
 
 # Define the router object, all endpoints created from this
 router = APIRouter()
@@ -321,6 +322,14 @@ async def get_pit_image_list(event_key: str):
     image_names = [image["filename"] for image in image_list]
 
     return image_names
+
+@unauthed_router.post("/drive_practice/new")
+async def create_drive_practice_data(data: dict):
+    db = Database.get_database("kestrel")
+
+    result = await db["drive_practice"].insert_one({"Time": datetime.now(), "data": data})
+
+    return result
 
 @unauthed_router.post("/user/login/{username}/{password}")
 async def login(username: str, password: str):
