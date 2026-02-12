@@ -107,7 +107,7 @@ async def get_predicted_aim(event_key: str):
 @router.get("/auto_paths/{event_key}")
 async def get_auto_paths(event_key: str):
     db = Database.get_database(event_key)
-    data = await db["auto_paths"].find({}, {"_id": 0}).to_list(length=None)
+    data = await db["auto_path"].find({}, {"_id": 0}).to_list(length=None)
 
     auto_paths = {}
     for path in data:
