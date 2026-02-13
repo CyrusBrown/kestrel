@@ -113,7 +113,7 @@ async def get_auto_paths(event_key: str):
     for path in data:
         if path["team_number"] not in auto_paths: # If the team number is not in the dictionary, add it
             auto_paths[path["team_number"]] = {}
-        path["match_numbers_played"] = str(path["match_numbers_played"])
+        path["matches_played"] = str(path["matches_played"])
         auto_paths[path["team_number"]][path["path_number"]] = path # Add the path to the team
     
     return auto_paths
