@@ -337,8 +337,8 @@ async def login(username: str, password: str):
 
     result = await db["mpv_users"].find_one({"username": username}, {"_id": 0})
     if result is None:
-        HTTPException(status_code=404, detail=f"User {username} not found")
+        raise HTTPException(status_code=404, detail=f"User {username} not found")
     if result["password"] != password:
-        HTTPException(status_code=404, detail=f"Invalid password {password}")
+        raise HTTPException(status_code=404, detail=f"Invalid password {password}")
     else:
         return generate_access_token(username)
